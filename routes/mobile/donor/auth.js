@@ -37,7 +37,7 @@ passport.use(
 passport.use(
   new JWTstrategy(
     {
-      secretOrKey: "ZuriFundMeMobileApps3cr3T",
+      secretOrKey: process.env.secret_key,
       jwtFromRequest: ExtractJWT.fromUrlQueryParameter("secret_token"),
     },
     async (token, done) => {

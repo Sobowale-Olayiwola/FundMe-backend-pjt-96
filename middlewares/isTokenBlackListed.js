@@ -1,10 +1,10 @@
-const RedisDB = require("../database/redis");
-const redisClient = RedisDB.client;
+const RedisBackend = require("../database/redis");
+const redisClient = RedisBackend.client;
+
 module.exports = (request, response, next) => {
   // 1. take out the userId and token from the request
-  const userId = request.params.id;
+  const userId = request.userId;
   const token = request.query.secret_token;
-  //const { userId, token } = request;
 
   // 2. Check redis if the user exists
   redisClient.get(userId, (error, data) => {
@@ -15,10 +15,12 @@ module.exports = (request, response, next) => {
     if (data !== null) {
       const parsedData = JSON.parse(data);
       if (parsedData[userId].includes(token)) {
-        return response.send({
+        return response.status(405).send({
           message: "You have to login!",
         });
       }
+      return next();
+    } else {
       return next();
     }
   });

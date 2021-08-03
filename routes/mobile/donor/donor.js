@@ -4,9 +4,8 @@ const jwt = require("jsonwebtoken");
 const router = express.Router();
 const DonorController = require("../../../controllers/mobile/DonorController");
 const verifyToken = require("../../../middlewares/verifyToken");
-const redisClient = require("../../../index");
-// const RedisDB = require("../../../database/redis");
-// const redisClient = RedisDB.client;
+const RedisBackend = require("../../../database/redis");
+const redisClient = RedisBackend.client;
 require("dotenv").config();
 
 router.post("/signup", DonorController.createDonorProfile);
@@ -23,7 +22,6 @@ router.post("/login", async (req, res, next) => {
       req.login(user, { session: false }, async (error) => {
         if (error) return next(error);
         const body = { _id: user._id, email: user.email };
-        // const body = user;
         const token = jwt.sign({ user: body }, process.env.secret_key);
 
         return res.json({ token });
@@ -34,7 +32,7 @@ router.post("/login", async (req, res, next) => {
   })(req, res, next);
 });
 
-router.post("/logout", verifyToken, function (request, response) {
+router.get("/logout", verifyToken, function (request, response) {
   // 3. take out the userId and token from the request
   const { userId, token } = request;
 

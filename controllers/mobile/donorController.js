@@ -26,12 +26,21 @@ module.exports = class DonorController {
   }
 
   static async getDonorById(request, response) {
+    let userId;
     try {
-      let Donor = await DonorService.getDonorById(request.params.id);
-
-      response
-        .status(200)
-        .json({ code: "SUCCESS", success: Donor, error: null });
+      if (request.params.id) {
+        userId = request.params.id;
+      } else if (request.userId) {
+        userId = request.userId;
+      }
+      let Donor = await DonorService.getDonorById(userId);
+      Donor.password = null;
+      response.status(200).json({
+        code: "SUCCESS",
+        success: Donor,
+        token: request.token,
+        error: null,
+      });
     } catch (error) {
       response.status(500).json({
         code: "FAILED",
@@ -44,9 +53,14 @@ module.exports = class DonorController {
   }
 
   static async deleteDonorById(request, response) {
+    let userId;
     try {
-      let Donor = await DonorService.deleteDonorById(request.params.id);
-
+      if (request.params.id) {
+        userId = request.params.id;
+      } else if (request.userId) {
+        userId = request.userId;
+      }
+      let Donor = await DonorService.deleteDonorById(userId);
       response
         .status(200)
         .json({ code: "SUCCESS", success: Donor, error: null });
@@ -62,11 +76,14 @@ module.exports = class DonorController {
   }
 
   static async updateDonorByid(request, response) {
+    let userId;
     try {
-      let Donor = await DonorService.updateDonorById(
-        request.params.id,
-        request.body
-      );
+      if (request.params.id) {
+        userId = request.params.id;
+      } else if (request.userId) {
+        userId = request.userId;
+      }
+      let Donor = await DonorService.updateDonorById(userId, request.body);
       response
         .status(200)
         .json({ code: "SUCCESS", success: Donor, error: null });
